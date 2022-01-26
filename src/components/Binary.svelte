@@ -7,7 +7,7 @@
     habitsRef.set({
       habit: text,
       value: start,
-      date: Date.now(),
+      date: new Date(new Date(Date.now()).setHours(0, 0, 0, 0)).getTime(),
     });
   }
 </script>

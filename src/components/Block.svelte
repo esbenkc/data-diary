@@ -1,5 +1,6 @@
 <script>
   import { where } from "firebase/firestore";
+  import { get_store_value } from "svelte/internal";
 
   import { User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
@@ -19,61 +20,43 @@
       </p> -->
 
       <span slot="loading">Loading data...</span>
-      <span slot="fallback" />
+      <span slot="fallback">
+        <!-- 4. 💬 Get all the comments in its subcollection -->
 
-      <!-- 4. 💬 Get all the comments in its subcollection -->
-
-      <h3>CONTENT</h3>
-      <Collection
-        path={postRef.collection("habits")}
-        query={(ref) =>
-          ref.where("date", "==", Date.now().setHours(0, 0, 0, 0))}
-        let:data={habits}
-        let:ref={habitsRef}
-        log
-      >
-        {#if !comments.length}
-          No comments yet...
-        {/if}
-
-        {#each habits as habit}
-          <p>
-            <!-- ID: <em>{comment.ref.id}</em> -->
-          </p>
-          <p>
-            {comment.text}
-            <button on:click={() => comment.ref.delete()}>Delete</button>
-          </p>
-        {/each}
-
-        <button
-          on:click={() =>
-            commentsRef.add({
-              text: "💬 Me too!",
-              createdAt: Date.now().setHours(0, 0, 0, 0),
-            })}
+        <h3>CONTENT</h3>
+        <Collection
+          path={postRef.collection("habits")}
+          query={(ref) =>
+            ref.where(
+              "date",
+              "==",
+              new Date(new Date(Date.now()).setHours(0, 0, 0, 0)).getTime()
+            )}
+          let:data={habits}
+          let:ref={habitsRef}
+          log
         >
-          Add Comment
-        </button>
-
-        <span slot="loading">Loading comments...</span>
-
-        <div class="block-title">
-          <h2>Lifestyle</h2>
-          <div class="block-title-right">
-            <a href="">Today 📅</a>
-          </div>
-        </div>
-        <Binary text={"Got up at 6:00"} start={false} {habitsRef} />
-        <Binary text={"Exercise"} start={false} />
-        <Binary text={"Caffeine"} start={false} />
-        <Binary text={"Read book"} start={false} />
-        <Binary
-          text={"Github: 5 commits<span style='font-size:0.75rem;'>🔗</span>"}
-          start={false}
-        />
-        <Binary text={"Slept well"} start={false} />
-      </Collection>
+          <span slot="loading">Loading data...</span>
+          <span slot="fallback">
+            <div class="block-title">
+              <h2>Lifestyle</h2>
+              <div class="block-title-right">
+                <a href=".">Today 📅</a>
+              </div>
+            </div>
+            <Binary text={"Got up at 6:00"} start={false} {habitsRef} />
+            <Binary text={"Exercise"} start={false} {habitsRef} />
+            <Binary text={"Caffeine"} start={false} {habitsRef} />
+            <Binary text={"Read book"} start={false} {habitsRef} />
+            <Binary
+              text={"Github: 5 commits<span style='font-size:0.75rem;'>🔗</span>"}
+              start={false}
+              {habitsRef}
+            />
+            <Binary text={"Slept well"} start={false} {habitsRef} />
+          </span>
+        </Collection>
+      </span>
     </Doc>
   {:else if type == "freestyle"}
     <div class="block-title">
