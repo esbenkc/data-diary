@@ -2,6 +2,7 @@
   import { FirebaseApp, User, Doc, Collection } from "sveltefire";
   import Nav from "./components/Nav.svelte";
   import Block from "./components/Block.svelte";
+  import Login from "./components/Login.svelte";
 
   import firebase from "firebase/app";
   import "firebase/firestore";
@@ -58,9 +59,6 @@
       <Block type={"lifestyle"} />
       <Block type={"freestyle"} />
     </div>
-    {#if !firebaseConfig.projectId}
-      <p>🦉 Error occured with the backend!</p>
-    {/if}
 
     <div class="login-background" slot="signed-out">
       <div class="login-block">
@@ -136,6 +134,14 @@
 
 <!-- Styles -->
 <style>
+  .main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: top;
+  }
+
   .login-background {
     width: 100vw;
     height: 100vh;
