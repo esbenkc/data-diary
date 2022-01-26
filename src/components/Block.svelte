@@ -1,6 +1,7 @@
 <script>
+  import { orderBy } from "firebase/firestore";
   import { where } from "firebase/firestore";
-  import { get_store_value } from "svelte/internal";
+  import { fix_and_destroy_block, get_store_value } from "svelte/internal";
 
   import { User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
@@ -8,6 +9,15 @@
 
   export let type = "empty";
   export let user = new User();
+
+  let habitsList = [
+    "Wake at 6:00",
+    "Drink 1.5L water",
+    "Sleep at 23:00",
+    "Exercise",
+    "Read book",
+    "5x Github commits",
+  ];
 </script>
 
 <div class="block">
@@ -23,7 +33,6 @@
       <span slot="fallback">
         <!-- 4. 💬 Get all the comments in its subcollection -->
 
-        <h3>CONTENT</h3>
         <Collection
           path={postRef.collection("habits")}
           query={(ref) =>
@@ -37,24 +46,28 @@
           log
         >
           <span slot="loading">Loading data...</span>
-          <span slot="fallback">
-            <div class="block-title">
-              <h2>Lifestyle</h2>
-              <div class="block-title-right">
-                <a href=".">Today 📅</a>
-              </div>
+          <div class="block-title">
+            <h2>Lifestyle</h2>
+            <div class="block-title-right">
+              <a href=".">Today 📅</a>
             </div>
-            <Binary text={"Got up at 6:00"} start={false} {habitsRef} />
-            <Binary text={"Exercise"} start={false} {habitsRef} />
-            <Binary text={"Caffeine"} start={false} {habitsRef} />
-            <Binary text={"Read book"} start={false} {habitsRef} />
+          </div>
+
+          {#each habitsList as habitText}
             <Binary
-              text={"Github: 5 commits<span style='font-size:0.75rem;'>🔗</span>"}
-              start={false}
-              {habitsRef}
+              text={habitText}
+              start={habits.find((o) => o.habit == habitText)
+                ? habits.find((o) => o.habit == habitText).value
+                : false}
+              on:toggle={(event) => {
+                habitsRef.doc(event.detail.habit + event.detail.date).set({
+                  habit: event.detail.habit,
+                  value: event.detail.value,
+                  date: event.detail.date,
+                });
+              }}
             />
-            <Binary text={"Slept well"} start={false} {habitsRef} />
-          </span>
+          {/each}
         </Collection>
       </span>
     </Doc>

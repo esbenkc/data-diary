@@ -1,10 +1,15 @@
 <script>
+  import { createEventDispatcher } from "svelte";
   export let text = "Define <code>text</code>";
   export let start = false;
   export let habitsRef = {};
+
+  const dispatch = createEventDispatcher();
+
   function toggle() {
     start = !start;
-    habitsRef.set({
+
+    dispatch("toggle", {
       habit: text,
       value: start,
       date: new Date(new Date(Date.now()).setHours(0, 0, 0, 0)).getTime(),
