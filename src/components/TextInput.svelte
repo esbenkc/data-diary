@@ -1,12 +1,30 @@
 <script>
+  import { createEventDispatcher } from "svelte";
+
   export let title = "Define <code>&lt;title&gt;</code>";
+  export let content = "";
+  const dispatch = createEventDispatcher();
+
+  function uploadText() {
+    dispatch("textInput", {
+      name: title,
+      value: content,
+      date: new Date(new Date(Date.now()).setHours(0, 0, 0, 0)).getTime(),
+    });
+  }
 </script>
 
 <div class="wrapper">
   <h4>
     {@html title}
   </h4>
-  <textarea rows="5" id="title" placeholder="Write here" />
+  <textarea
+    rows="5"
+    id="title"
+    placeholder="Write here"
+    bind:value={content}
+    on:change={uploadText}
+  />
 </div>
 
 <style>

@@ -18,19 +18,21 @@
     "Read book",
     "5x Github commits",
   ];
+
+  let textInputList = ["Positive:", "Constructive:", "Context:"];
 </script>
 
 <div class="block">
-  {#if type == "lifestyle"}
-    <Doc path={`diary/${user.uid}`} let:data={diary} let:ref={postRef} log>
-      <!-- <h2>{diary.title}</h2>
+  <Doc path={`diary/${user.uid}`} let:data={diary} let:ref={postRef} log>
+    <span slot="loading">Loading data...</span>
+    <span slot="fallback">
+      {#if type == "lifestyle"}
+        <!-- <h2>{diary.title}</h2>
 
       <p>
         Document created at <em>{new Date(post.createdAt).toLocaleString()}</em>
       </p> -->
 
-      <span slot="loading">Loading data...</span>
-      <span slot="fallback">
         <!-- 4. 💬 Get all the comments in its subcollection -->
 
         <Collection
@@ -69,19 +71,44 @@
             />
           {/each}
         </Collection>
-      </span>
-    </Doc>
-  {:else if type == "freestyle"}
-    <div class="block-title">
-      <h2>Freestyle</h2>
-      <div class="block-title-right">
-        <a href="" />
-      </div>
-    </div>
-    <TextInput title={"What did you do yesterday?"} />
-    <TextInput title={"Positive:"} />
-    <TextInput title={"Constructive comments:"} />
-  {/if}
+      {:else if type == "freestyle"}
+        <Collection
+          path={postRef.collection("textInput")}
+          query={(ref) =>
+            ref.where(
+              "date",
+              "==",
+              new Date(new Date(Date.now()).setHours(0, 0, 0, 0)).getTime()
+            )}
+          let:data={textInputs}
+          let:ref={textInputRef}
+          log
+        >
+          <div class="block-title">
+            <h2>Freestyle</h2>
+            <div class="block-title-right">
+              <a href="" />
+            </div>
+          </div>
+          {#each textInputList as title}
+            <TextInput
+              {title}
+              content={textInputs.find((o) => o.name == title) != undefined
+                ? textInputs.find((o) => o.name == title).value
+                : ""}
+              on:textInput={(event) => {
+                textInputRef.doc(event.detail.name + event.detail.date).set({
+                  name: event.detail.name,
+                  value: event.detail.value,
+                  date: event.detail.date,
+                });
+              }}
+            />
+          {/each}
+        </Collection>
+      {/if}
+    </span>
+  </Doc>
 </div>
 
 <style>
