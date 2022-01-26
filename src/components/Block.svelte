@@ -1,4 +1,6 @@
 <script>
+  import { orderBy } from "firebase/firestore";
+
   import { FirebaseApp, User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
   import TextInput from "./TextInput.svelte";
@@ -8,41 +10,31 @@
 
 <div class="block">
   {#if type == "lifestyle"}
-    <Doc path={`posts/${user.uid}`} let:data={post} let:ref={postRef} log>
-      <h2>{post.title}</h2>
+    <Doc path={`diary/${user.uid}`} let:data={diary} let:ref={postRef} log>
+      <!-- <h2>{diary.title}</h2>
 
       <p>
         Document created at <em>{new Date(post.createdAt).toLocaleString()}</em>
-      </p>
+      </p> -->
 
-      <span slot="loading">Loading post...</span>
-      <span slot="fallback">
-        <button
-          on:click={() =>
-            postRef.set({
-              title: "📜 I like Svelte",
-              createdAt: Date.now(),
-            })}
-        >
-          Create Document
-        </button>
-      </span>
+      <span slot="loading">Loading data...</span>
+      <span slot="fallback" />
 
       <!-- 4. 💬 Get all the comments in its subcollection -->
 
       <h3>Comments</h3>
       <Collection
-        path={postRef.collection("comments")}
+        path={postRef.collection("habits")}
         query={(ref) => ref.orderBy("createdAt")}
-        let:data={comments}
-        let:ref={commentsRef}
+        let:data={habits}
+        let:ref={habitsRef}
         log
       >
         {#if !comments.length}
           No comments yet...
         {/if}
 
-        {#each comments as comment}
+        {#each habits as habit}
           <p>
             <!-- ID: <em>{comment.ref.id}</em> -->
           </p>
@@ -63,23 +55,33 @@
         </button>
 
         <span slot="loading">Loading comments...</span>
+
+        <div class="block-title">
+          <h2>Lifestyle</h2>
+          <div class="block-title-right">
+            <a href="">Today 📅</a>
+          </div>
+        </div>
+        <Binary
+          text={"Got up at 6:00"}
+          start={false}
+          on:click={() =>
+            habitsRef.set({
+              habit: "Got up at 6:00",
+              value: start,
+              date: Date.now(),
+            })}
+        />
+        <Binary text={"Exercise"} start={false} />
+        <Binary text={"Caffeine"} start={false} />
+        <Binary text={"Read book"} start={false} />
+        <Binary
+          text={"Github: 5 commits<span style='font-size:0.75rem;'>🔗</span>"}
+          start={false}
+        />
+        <Binary text={"Slept well"} start={false} />
       </Collection>
     </Doc>
-    <div class="block-title">
-      <h2>Lifestyle</h2>
-      <div class="block-title-right">
-        <a href="">Today 📅</a>
-      </div>
-    </div>
-    <Binary text={"Got up at 6:00"} start={true} />
-    <Binary text={"Exercise"} start={false} />
-    <Binary text={"Caffeine"} start={false} />
-    <Binary text={"Read book"} start={false} />
-    <Binary
-      text={"Github: 5 commits<span style='font-size:0.75rem;'>🔗</span>"}
-      start={false}
-    />
-    <Binary text={"Slept well"} start={false} />
   {:else if type == "freestyle"}
     <div class="block-title">
       <h2>Freestyle</h2>
