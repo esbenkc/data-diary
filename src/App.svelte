@@ -1,12 +1,13 @@
 <script>
   import { FirebaseApp, User, Doc, Collection } from "sveltefire";
+  import Nav from "./components/Nav.svelte";
+  import Block from "./components/Block.svelte";
 
   import firebase from "firebase/app";
   import "firebase/firestore";
   import "firebase/auth";
   import "firebase/performance";
   import "firebase/analytics";
-  import { getRedirectResult, signInWithCredential } from "firebase/auth";
 
   let firebaseConfig = {
     apiKey: "AIzaSyAro6lxkrF2z6Mg7Cn4G3tXmiwGAy4P2rE",
@@ -48,111 +49,161 @@
   }
 </script>
 
-<main>
-  {#if !firebaseConfig.projectId}
-    <strong>Step 0</strong>
-    Create a
-    <a href="https://firebase.google.com/">Firebase Project</a>
-    and paste your web config into
-    <code>App.svelte</code>
-    .
-  {/if}
+<!-- 1. 🔥 Firebase App -->
+<FirebaseApp {firebase}>
+  <!-- 2. 😀 Get the current user -->
+  <User let:user let:auth>
+    <Nav userName={user.email} {auth} />
+    <div class="main">
+      <Block type={"lifestyle"} />
+      <Block type={"freestyle"} />
+    </div>
+    {#if !firebaseConfig.projectId}
+      <p>🦉 Error occured with the backend!</p>
+    {/if}
 
-  <!-- 1. 🔥 Firebase App -->
-  <FirebaseApp {firebase}>
-    <h1>💪🔥 Mode Activated</h1>
-
-    <p>
-      <strong>Tip:</strong>
-      Open the browser console for development logging.
-    </p>
-
-    <!-- 2. 😀 Get the current user -->
-    <User let:user let:auth>
-      Howdy 😀! User
-      <em>{user.email}</em>
-
-      <button on:click={() => auth.signOut()}>Sign Out</button>
-
-      <div slot="signed-out">
-        Email: <input type="email" bind:value={email} /> <br />
-        Password: <input type="password" bind:value={password} /> <br />
-        <button on:click={signUp}> Sign up </button>
-        <button on:click={signIn}> Login </button>
+    <div class="login-background" slot="signed-out">
+      <div class="login-block">
+        Email: <input type="email" bind:value={email} />
+        Password: <input type="password" bind:value={password} />
+        <button class="register" on:click={signUp}> Register </button>
+        <button class="login" on:click={signIn}> Login </button>
       </div>
+    </div>
 
-      <hr />
+    <hr />
 
-      <!-- 3. 📜 Get a Firestore document owned by a user -->
-      <Doc path={`posts/${user.uid}`} let:data={post} let:ref={postRef} log>
-        <h2>{post.title}</h2>
+    <!-- 3. 📜 Get a Firestore document owned by a user -->
+    <Doc path={`posts/${user.uid}`} let:data={post} let:ref={postRef} log>
+      <h2>{post.title}</h2>
 
-        <p>
-          Document created at <em
-            >{new Date(post.createdAt).toLocaleString()}</em
-          >
-        </p>
+      <p>
+        Document created at <em>{new Date(post.createdAt).toLocaleString()}</em>
+      </p>
 
-        <span slot="loading">Loading post...</span>
-        <span slot="fallback">
-          <button
-            on:click={() =>
-              postRef.set({
-                title: "📜 I like Svelte",
-                createdAt: Date.now(),
-              })}
-          >
-            Create Document
-          </button>
-        </span>
-
-        <!-- 4. 💬 Get all the comments in its subcollection -->
-
-        <h3>Comments</h3>
-        <Collection
-          path={postRef.collection("comments")}
-          query={(ref) => ref.orderBy("createdAt")}
-          let:data={comments}
-          let:ref={commentsRef}
-          log
+      <span slot="loading">Loading post...</span>
+      <span slot="fallback">
+        <button
+          on:click={() =>
+            postRef.set({
+              title: "📜 I like Svelte",
+              createdAt: Date.now(),
+            })}
         >
-          {#if !comments.length}
-            No comments yet...
-          {/if}
+          Create Document
+        </button>
+      </span>
 
-          {#each comments as comment}
-            <p>
-              <!-- ID: <em>{comment.ref.id}</em> -->
-            </p>
-            <p>
-              {comment.text}
-              <button on:click={() => comment.ref.delete()}>Delete</button>
-            </p>
-          {/each}
+      <!-- 4. 💬 Get all the comments in its subcollection -->
 
-          <button
-            on:click={() =>
-              commentsRef.add({
-                text: "💬 Me too!",
-                createdAt: Date.now(),
-              })}
-          >
-            Add Comment
-          </button>
+      <h3>Comments</h3>
+      <Collection
+        path={postRef.collection("comments")}
+        query={(ref) => ref.orderBy("createdAt")}
+        let:data={comments}
+        let:ref={commentsRef}
+        log
+      >
+        {#if !comments.length}
+          No comments yet...
+        {/if}
 
-          <span slot="loading">Loading comments...</span>
-        </Collection>
-      </Doc>
-    </User>
-  </FirebaseApp>
-</main>
+        {#each comments as comment}
+          <p>
+            <!-- ID: <em>{comment.ref.id}</em> -->
+          </p>
+          <p>
+            {comment.text}
+            <button on:click={() => comment.ref.delete()}>Delete</button>
+          </p>
+        {/each}
+
+        <button
+          on:click={() =>
+            commentsRef.add({
+              text: "💬 Me too!",
+              createdAt: Date.now(),
+            })}
+        >
+          Add Comment
+        </button>
+
+        <span slot="loading">Loading comments...</span>
+      </Collection>
+    </Doc>
+  </User>
+</FirebaseApp>
 
 <!-- Styles -->
 <style>
+  .login-background {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .login-block {
+    width: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f3f3f3;
+    border-radius: 2rem;
+    border: 2px solid #000;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+  }
+
+  .login-block > input {
+    margin-bottom: 1rem;
+    margin-top: 0.1rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #000;
+    border-radius: 0.5rem;
+  }
+
+  .login-block > button {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #000;
+    border-radius: 0.5rem;
+  }
+
+  .register {
+    background: #000;
+    color: #fff;
+  }
+
+  .register:hover,
+  .login:hover {
+    background: #fbc902;
+    color: #000;
+    cursor: pointer;
+  }
+
+  :global(body),
+  :global(html) {
+    padding: 0;
+    margin: 0;
+    background-color: #fbc902;
+    font-family: "JetBrains Mono", monospace;
+  }
+
   main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     text-align: center;
     padding: 1em;
-    max-width: 240px;
+    max-width: 80em;
     margin: 0 auto;
   }
 
