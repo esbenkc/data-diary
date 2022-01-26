@@ -1,11 +1,70 @@
 <script>
+  import { FirebaseApp, User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
   import TextInput from "./TextInput.svelte";
   export let type = "empty";
+  export let user = new User();
 </script>
 
 <div class="block">
   {#if type == "lifestyle"}
+    <Doc path={`posts/${user.uid}`} let:data={post} let:ref={postRef} log>
+      <h2>{post.title}</h2>
+
+      <p>
+        Document created at <em>{new Date(post.createdAt).toLocaleString()}</em>
+      </p>
+
+      <span slot="loading">Loading post...</span>
+      <span slot="fallback">
+        <button
+          on:click={() =>
+            postRef.set({
+              title: "📜 I like Svelte",
+              createdAt: Date.now(),
+            })}
+        >
+          Create Document
+        </button>
+      </span>
+
+      <!-- 4. 💬 Get all the comments in its subcollection -->
+
+      <h3>Comments</h3>
+      <Collection
+        path={postRef.collection("comments")}
+        query={(ref) => ref.orderBy("createdAt")}
+        let:data={comments}
+        let:ref={commentsRef}
+        log
+      >
+        {#if !comments.length}
+          No comments yet...
+        {/if}
+
+        {#each comments as comment}
+          <p>
+            <!-- ID: <em>{comment.ref.id}</em> -->
+          </p>
+          <p>
+            {comment.text}
+            <button on:click={() => comment.ref.delete()}>Delete</button>
+          </p>
+        {/each}
+
+        <button
+          on:click={() =>
+            commentsRef.add({
+              text: "💬 Me too!",
+              createdAt: Date.now(),
+            })}
+        >
+          Add Comment
+        </button>
+
+        <span slot="loading">Loading comments...</span>
+      </Collection>
+    </Doc>
     <div class="block-title">
       <h2>Lifestyle</h2>
       <div class="block-title-right">
