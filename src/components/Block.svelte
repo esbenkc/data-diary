@@ -1,7 +1,7 @@
 <script>
-  import { orderBy } from "firebase/firestore";
+  import { where } from "firebase/firestore";
 
-  import { FirebaseApp, User, Doc, Collection } from "sveltefire";
+  import { User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
   import TextInput from "./TextInput.svelte";
   export let type = "empty";
@@ -22,10 +22,11 @@
 
       <!-- 4. 💬 Get all the comments in its subcollection -->
 
-      <h3>Comments</h3>
+      <h3>CONTENT</h3>
       <Collection
         path={postRef.collection("habits")}
-        query={(ref) => ref.orderBy("createdAt")}
+        query={(ref) =>
+          ref.where("date", "==", Date.now().setHours(0, 0, 0, 0))}
         let:data={habits}
         let:ref={habitsRef}
         log
@@ -48,7 +49,7 @@
           on:click={() =>
             commentsRef.add({
               text: "💬 Me too!",
-              createdAt: Date.now(),
+              createdAt: Date.now().setHours(0, 0, 0, 0),
             })}
         >
           Add Comment
