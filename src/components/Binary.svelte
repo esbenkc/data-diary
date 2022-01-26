@@ -1,9 +1,14 @@
 <script>
   export let text = "Define <code>text</code>";
   export let start = false;
-
+  export let habitsRef = {};
   function toggle() {
     start = !start;
+    habitsRef.set({
+      habit: text,
+      value: start,
+      date: Date.now(),
+    });
   }
 </script>
 

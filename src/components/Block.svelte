@@ -4,6 +4,7 @@
   import { User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
   import TextInput from "./TextInput.svelte";
+
   export let type = "empty";
   export let user = new User();
 </script>
@@ -63,16 +64,7 @@
             <a href="">Today 📅</a>
           </div>
         </div>
-        <Binary
-          text={"Got up at 6:00"}
-          start={false}
-          on:click={() =>
-            habitsRef.set({
-              habit: "Got up at 6:00",
-              value: start,
-              date: Date.now(),
-            })}
-        />
+        <Binary text={"Got up at 6:00"} start={false} {habitsRef} />
         <Binary text={"Exercise"} start={false} />
         <Binary text={"Caffeine"} start={false} />
         <Binary text={"Read book"} start={false} />
