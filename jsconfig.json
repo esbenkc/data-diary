@@ -7,5 +7,5 @@
 		}
 	},
 	"include": ["src/**/*.d.ts", "src/**/*.js", "src/**/*.svelte"],
-	"type": "module",
+	"type": "commonjs",
 }
