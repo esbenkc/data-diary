@@ -2,7 +2,6 @@
   import { createEventDispatcher } from "svelte";
   export let text = "Define <code>text</code>";
   export let start = false;
-  export let habitsRef = {};
 
   const dispatch = createEventDispatcher();
 
@@ -20,9 +19,9 @@
 <div class="binary-wrapper">
   <h4>{@html text}</h4>
   {#if start}
-    <p on:click={toggle}>on</p>
+    <p class="on" on:click={toggle}>✔</p>
   {:else}
-    <p on:click={toggle}>off</p>
+    <p class="off" on:click={toggle}>❌</p>
   {/if}
 </div>
 
@@ -37,7 +36,20 @@
   p {
     margin: 0;
     padding: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 2px solid #000;
+    cursor: pointer;
   }
+
+  .on {
+    background-color: #00b300;
+  }
+
+  .off {
+    background-color: #ff0000;
+  }
+
   .binary-wrapper {
     display: flex;
     flex-direction: row;

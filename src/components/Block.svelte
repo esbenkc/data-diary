@@ -1,14 +1,11 @@
 <script>
-  import { orderBy } from "firebase/firestore";
-  import { where } from "firebase/firestore";
-  import { fix_and_destroy_block, get_store_value } from "svelte/internal";
-
   import { User, Doc, Collection } from "sveltefire";
   import Binary from "./Binary.svelte";
   import TextInput from "./TextInput.svelte";
 
   export let type = "empty";
   export let user = new User();
+  export let selectedDate = new Date();
 
   let habitsList = [
     "Wake at 6:00",
@@ -27,14 +24,6 @@
     <span slot="loading">Loading data...</span>
     <span slot="fallback">
       {#if type == "lifestyle"}
-        <!-- <h2>{diary.title}</h2>
-
-      <p>
-        Document created at <em>{new Date(post.createdAt).toLocaleString()}</em>
-      </p> -->
-
-        <!-- 4. 💬 Get all the comments in its subcollection -->
-
         <Collection
           path={postRef.collection("habits")}
           query={(ref) =>
@@ -51,7 +40,7 @@
           <div class="block-title">
             <h2>Lifestyle</h2>
             <div class="block-title-right">
-              <a href=".">Today 📅</a>
+              <p>{selectedDate.toDateString()} 📅</p>
             </div>
           </div>
 
@@ -86,9 +75,7 @@
         >
           <div class="block-title">
             <h2>Freestyle</h2>
-            <div class="block-title-right">
-              <a href="" />
-            </div>
+            <div class="block-title-right" />
           </div>
           {#each textInputList as title}
             <TextInput
@@ -128,13 +115,14 @@
     transform: translate(-0.5rem, -0.5rem);
   }
 
-  .block-title-right > a {
+  .block-title-right > p {
     text-decoration: none;
     color: #000;
     padding-bottom: 0.6rem;
+    cursor: pointer;
   }
 
-  .block-title-right > a:hover {
+  .block-title-right > p:hover {
     font-weight: 700;
   }
 
