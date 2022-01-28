@@ -2,6 +2,7 @@
   import { FirebaseApp, User, Doc, Collection } from "sveltefire";
   import Nav from "./components/Nav.svelte";
   import Block from "./components/Block.svelte";
+  import { DatePicker } from "date-picker-svelte";
 
   import firebase from "firebase/app";
   import "firebase/firestore";
@@ -21,6 +22,8 @@
 
   firebase.initializeApp(firebaseConfig);
 
+  let selectedDate = new Date();
+  let selectDate = true;
   let email = "";
   let password = "";
 
@@ -47,6 +50,10 @@
         console.log(error);
       });
   }
+
+  function toggleDateSelector() {
+    selectDate = !selectDate;
+  }
 </script>
 
 <!-- 1. 🔥 Firebase App -->
@@ -55,8 +62,8 @@
   <User let:user let:auth>
     <Nav userName={user.email} {auth} />
     <div class="main">
-      <Block type={"lifestyle"} {user} />
-      <Block type={"freestyle"} {user} />
+      <Block type={"lifestyle"} {user} {selectedDate} />
+      <Block type={"freestyle"} {user} {selectedDate} />
     </div>
 
     <div class="login-background" slot="signed-out">
@@ -68,12 +75,27 @@
       </div>
     </div>
 
-    <!-- 3. 📜 Get a Firestore document owned by a user -->
+    <div class="date-picker-wrapper" on:click={toggleDateSelector}>
+      {#if selectDate}
+        <DatePicker bind:value={selectedDate} />
+      {/if}
+    </div>
   </User>
 </FirebaseApp>
 
-<!-- Styles -->
 <style>
+  .date-picker-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #ff0000;
+    border: 2px solid #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+  }
+
   .main {
     display: flex;
     flex-direction: row;
@@ -140,33 +162,5 @@
     margin: 0;
     background-color: #fbc902;
     font-family: "JetBrains Mono", monospace;
-  }
-
-  main {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    text-align: center;
-    padding: 1em;
-    max-width: 80em;
-    margin: 0 auto;
-  }
-
-  h1,
-  em {
-    color: #ff3e00;
-  }
-
-  hr {
-    height: 1px;
-    border: none;
-    background: rgb(195, 195, 195);
-  }
-
-  @media (min-width: 640px) {
-    main {
-      max-width: none;
-    }
   }
 </style>
