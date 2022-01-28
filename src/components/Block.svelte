@@ -119,11 +119,6 @@
     text-decoration: none;
     color: #000;
     padding-bottom: 0.6rem;
-    cursor: pointer;
-  }
-
-  .block-title-right > p:hover {
-    font-weight: 700;
   }
 
   .block-title {
